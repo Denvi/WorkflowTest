@@ -58,6 +58,7 @@ jobs:
     - name: Deploy
       uses: WebFreak001/deploy-nightly@v3.2.0
       with:
+        tag: nightly
         upload_url: https://uploads.github.com/repos/Denvi/WorkflowTest/releases/240981816/assets{?name,label}
         release_id: 240981816
         asset_path: ${{github.workspace}}/fmtexample.zip
