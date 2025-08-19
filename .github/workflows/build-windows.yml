@@ -66,3 +66,8 @@ jobs:
         asset_content_type: application/zip
         max_releases: 7
         ignore_hash: true
+
+    - name: Update tag
+      run: |
+        git tag -f v1.0
+        git push origin tag v1.0 --force
