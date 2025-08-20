@@ -17,26 +17,26 @@ env:
 
 jobs:
   check_date:
-      runs-on: ubuntu-latest
-      name: Check latest commit
-      outputs:
-        should_run: ${{ steps.should_run.outputs.should_run }}
-      steps:
-        - uses: actions/checkout@v2
+    runs-on: ubuntu-latest
+    name: Check latest commit
+    outputs:
+      should_run: ${{ steps.should_run.outputs.should_run }}
+    steps:
+      - uses: actions/checkout@v4
 
-        - name: Output latest commit SHA
-          run: echo ${{ github.sha }}
+      - name: Output latest commit SHA
+        run: echo ${{ github.sha }}
 
-        - name: Check latest commit is less than a day
-          id: should_run
-          continue-on-error: true
-          # if: ${{ github.event_name == 'schedule' }}
-          run: |
-            if git rev-list --after="1 minutes" ${{ github.sha }} | grep -q .; then
-              echo "should_run=true"  >> "$GITHUB_OUTPUT"
-            else
-              echo "should_run=false" >> "$GITHUB_OUTPUT"
-            fi
+      - name: Check latest commit is less than a day
+        id: should_run
+        continue-on-error: true
+        if: ${{ github.event_name == 'schedule' }}
+        run: |
+          if git rev-list --after="1 minutes" ${{ github.sha }} | grep -q .; then
+            echo "should_run=true"  >> "$GITHUB_OUTPUT"
+          else
+            echo "should_run=false" >> "$GITHUB_OUTPUT"
+          fi
 
   build:
     runs-on: windows-latest
@@ -73,22 +73,22 @@ jobs:
     - name: Install
       run: cmake --install ${{github.workspace}}/build --config ${{env.BUILD_TYPE}}
 
-    - name: Create archive
-      run: |
-        Compress-Archive -Path ${{github.workspace}}/build/dist -DestinationPath fmtexample.zip
+    # - name: Create archive
+    #   run: |
+    #     Compress-Archive -Path ${{github.workspace}}/build/dist -DestinationPath fmtexample.zip
 
     - name: Upload artifact
       uses: actions/upload-artifact@v4
       with:
         name: fmtexample-${{ github.sha }}
-        path: ${{github.workspace}}/fmtexample.zip
+        path: ${{github.workspace}}/build/dist/
 
     - name: Deploy
       uses: WebFreak001/deploy-nightly@v3.2.0
       with:
         upload_url: https://uploads.github.com/repos/Denvi/WorkflowTest/releases/240989377/assets{?name,label}
         release_id: 240989377
-        asset_path: ${{github.workspace}}/fmtexample.zip
+        asset_path: ${{github.workspace}}/build/dist/
         asset_name: fmtexample-$$.zip
         asset_content_type: application/zip
         max_releases: 7
