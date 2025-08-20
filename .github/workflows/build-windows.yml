@@ -16,7 +16,7 @@ env:
   VCPKG_DEFAULT_BINARY_CACHE: ${{github.workspace}}/vcpkg_cache
 
 jobs:
-  check:
+  check_date:
       runs-on: ubuntu-latest
       name: Check latest commit
       outputs:
