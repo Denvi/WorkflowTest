@@ -16,7 +16,7 @@ env:
   VCPKG_DEFAULT_BINARY_CACHE: ${{github.workspace}}/vcpkg_cache
 
 jobs:
-  check_date:
+  check:
       runs-on: ubuntu-latest
       name: Check latest commit
       outputs:
@@ -27,14 +27,20 @@ jobs:
         - name: Output latest commit SHA
           run: echo ${{ github.sha }}
 
-        - id: should_run
+        - name: Check latest commit is less than a day
+          id: should_run
           continue-on-error: true
-          name: Check latest commit is less than a day
           # if: ${{ github.event_name == 'schedule' }}
-          run: test -z $(git rev-list  --after="24 hours"  ${{ github.sha }}) && echo "::set-output name=should_run::false"
+          run: |
+            if git rev-list --after="24 hours" ${{ github.sha }} | grep -q .; then
+              echo "should_run=true"  >> "$GITHUB_OUTPUT"
+            else
+              echo "should_run=false" >> "$GITHUB_OUTPUT"
+            fi
 
   build:
     runs-on: windows-latest
+    name: Build
 
     needs: check_date
     if: ${{ needs.check_date.outputs.should_run != 'false' }}
