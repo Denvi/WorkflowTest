@@ -32,7 +32,7 @@ jobs:
           continue-on-error: true
           # if: ${{ github.event_name == 'schedule' }}
           run: |
-            if git rev-list --after="24 hours" ${{ github.sha }} | grep -q .; then
+            if git rev-list --after="1 minutes" ${{ github.sha }} | grep -q .; then
               echo "should_run=true"  >> "$GITHUB_OUTPUT"
             else
               echo "should_run=false" >> "$GITHUB_OUTPUT"
